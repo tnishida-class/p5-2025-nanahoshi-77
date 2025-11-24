@@ -14,7 +14,18 @@ function windowResized(){
 
 function draw(){
   background(160, 192, 255);
-
+  // BLANK[1] 新しい的オブジェクトを作成して targets 配列に追加しよう
+  // 20フレームごとに新しい的を追加する 
+  if(frameCount % 10 === 0) {
+    const t = {
+      x : windowWidth / 2,
+      y : windowHeight / 2,
+      vx : random(-10, 10),
+      vy : random(-10, 10),
+      size : 20
+    };
+    targets.push(t); // inserted into the array
+  }
   // 的のアニメーション（注意：追加しないと何も起きない）
   for(let i = 0; i < targets.length; i++){
     let t = targets[i];
@@ -24,7 +35,6 @@ function draw(){
     t.y += t.vy;
     t.size += 2;
   }
-
   // ボールのアニメーション
   for(let i = 0; i < balls.length; i++){
     let b = balls[i];
@@ -47,10 +57,6 @@ function draw(){
   // 補足：filter 関数を使うともっと簡単に書ける
   // balls = balls.filter(insideCanvas);
 
-  if(frameCount % 20 === 0) { // 20フレームごとに新しい的を追加する
-    // BLANK[1] 新しい的オブジェクトを作成して targets 配列に追加しよう
-  }
-
   // ボールに当たった or 大きくなりすぎた的を配列から削除する
   const activeTargets = []; // 生き残った的を一時的に保持する配列
   for(let i = 0; i < targets.length; i++){
@@ -59,8 +65,11 @@ function draw(){
       let hit = false;
       for(let j = 0; j < balls.length; j++){ // すべてのボールと衝突判定
         let b = balls[j];
-        // BLANK[2]
-      }
+        let d = dist(b.x, b.y, t.x, t.y);
+         if (d < (b.size / 2 + t.size / 2)) {
+          hit = true;
+         }
+        }
       if(!hit) activeTargets.push(t); // 衝突していなければ生き残る
     }
   }
@@ -71,11 +80,15 @@ function mouseDragged(){
   const dx = mouseX - pmouseX;
   const dy = mouseY - pmouseY;
   if(mag(dx, dy) > 5){
-    const b = { x: mouseX, y: mouseY, size: 20, vx: dx, vy: dy };
+    const b = { 
+      x: mouseX, 
+      y: mouseY, 
+      size: 20, 
+      vx: dx, 
+      vy: dy };
     balls.push(b);
   }
 }
-
 function insideCanvas(b) {
   return b.x > 0 && b.x < width && b.y > 0 && b.y < height;
 }
